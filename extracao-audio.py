@@ -21,11 +21,13 @@ def handle_audio_files(video_path):
     audio_data = audio_from_video.export(audio_path, format="mp3")
     logging.info(f"Audio extracted and saved to: {audio_path}")
     return (audio_path, audio_data)
+
 # %%
 def get_openai_client():
     logging.info("Loading environment variables and initializing OpenAI client")
     load_dotenv()
     return OpenAI()
+
 # %%
 def transcribe_video(client, video_path):
     logging.info(f"Starting transcription for video: {video_path}")
@@ -37,15 +39,17 @@ def transcribe_video(client, video_path):
     os.remove(audio_path)
     logging.info(f"Temporary audio file removed: {audio_path}")
     return transcription.text
+
 # %%
 def generate_procedure(client, transcription, language="Portuguese"):
     logging.info("Generating step-by-step procedure from transcription")
-    messages = [
-        {"role": "system", "content": f"""
+    prompt = f"""
             You are a helpful assistant. Using the provided transcription, generate a step-by-step procedure of the explained process.
-            Make sure that the process was written in {language}. Return only the procedure, without any explanation or additional information.
+            Make sure that the procedure was written in {language}. Return only the procedure, without any explanation or additional information.
             Transcription:
-        """},
+            """
+    messages = [
+        {"role": "system", "content": prompt},
         {"role": "user", "content": transcription},
     ]
     
@@ -55,14 +59,16 @@ def generate_procedure(client, transcription, language="Portuguese"):
     )
     logging.info("Procedure generation completed")
     return response.choices[0].message.content
+
 # %%
 def save_to_file(content, filepath):
     logging.info(f"Saving procedure to file: {filepath}")
     with open(filepath, 'w') as file:
         file.write(content)
     logging.info("Procedure saved successfully")
+
 # %%
-def main(video_path, procedure_path, language="Portuguese"):
+def main(video_path, procedure_path, language):
     client = get_openai_client()
     transcription = transcribe_video(client, video_path)
     procedure = generate_procedure(client, transcription, language)
