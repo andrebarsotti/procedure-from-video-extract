@@ -46,7 +46,7 @@ OPENAI_API_KEY=your_openai_api_key
 To run the script and generate a procedure from a video file:
 
 ```bash
-python extracao-audio.py <video_path> <procedure_path> [language]
+python extracao-audio.py -v <video_path> -o	 <procedure_path> -l [language]
 ```
 
 - `<video_path>`: Path to the input video file.
